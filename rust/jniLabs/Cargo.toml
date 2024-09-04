@@ -1,0 +1,16 @@
+[package]
+name = "jniLabs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+jni = "0.21.1"
+tokio = {version = "1", features = ["full"]}
+tracing = "0.1.37"
+helios = {path="/Users/siyuan/workspace/blockchain/helios"}
+alloy = { version = "0.2.1", features = ["full"] }
+eyre = "0.6.12"
+criterion = { version = "0.5.1", features = ["async_tokio", "plotters"] }
+
+[lib]
+crate_type = ["cdylib"]
