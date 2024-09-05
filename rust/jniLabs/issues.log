@@ -1,0 +1,4 @@
+# Issue list
+
+## Problem command: cargo build --target aarch64-linux-android --release
+
