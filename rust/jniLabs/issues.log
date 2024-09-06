@@ -2,3 +2,6 @@
 
 ## Problem command: cargo build --target aarch64-linux-android --release
 
+## Build failed
+### Solution
+https://github.com/kotauskas/interprocess/commit/db6c36d1ccf86e607490e116d15ec7dbca1500af#diff-d9b4f6bc9789fd7fed0f2d240209132772cff9ff9ca6d05859311c60f656ba65

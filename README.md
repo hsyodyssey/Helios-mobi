@@ -24,3 +24,5 @@ Android has stricter rules for file access, which causes this problem.
 2. Failed in constructing new Node(ConsensusClient). This failure happens in the following code snippet:
 - https://github.com/a16z/helios/blob/master/client/src/node.rs#L34-L35
 
+3. Client synced failed. `client.wait_synced().await;`
+The client syncing process is killed by JVM for unknown reasons.
