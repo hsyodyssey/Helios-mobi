@@ -1,7 +1,6 @@
 class HeliosRust {
     // This declares that the static `hello` method will be provided
     // a native library.
-    private static native String testClientFuck();
     private static native String getBalance();
 
 
@@ -16,6 +15,6 @@ class HeliosRust {
     // The rest is just regular ol' Java!
     public static void main(String[] args) {
         String output = HeliosRust.getBalance();
-        System.out.println(output);
+        System.out.println("[Java|Kotlin] The balance is :" + output);
     }
 }

@@ -1,0 +1,9 @@
+# Intro
+
+## Command
+
+1. Build the library
+`cargo build --release`
+
+2. Move the library to the java library folder.
+- `sudo cp target/release/libhelios_test_lib.so /usr/lib/x86_64-linux-gnu/jni`
