@@ -10,6 +10,7 @@
 
 ### High Priority
 - [ ] Task 1: Fix: consensus client constructing failed problem: refactor Helios-Rust
+    - [ ] Sub-Task 1: Feat: decouple the consensus client create and sync fucntion.
 - [ ] Task 2: Feat: JNI Interface for Android(Rust + Kotlin)
 
 ## Current Problem
