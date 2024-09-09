@@ -1,10 +1,9 @@
-use helios::client;
 use jni::JNIEnv;
 
 // These objects are what you should use as arguments to your native
 // function. They carry extra lifetime information to prevent them escaping
 // this context and getting used after being GC'd.
-use jni::objects::{JClass, JString};
+use jni::objects::JClass;
 
 // This is just a pointer. We'll be returning it from our function. We
 // can't return one of the objects with lifetime information because the
@@ -109,7 +108,13 @@ async fn get_balance(mut client: Client<FileDB>) -> Result<String, String> {
 
     println!("[Helios-Android-JNI][Siyuan han Magic]: Sleep for a while zzzzzzzzzzzzz");
 
-    thread::sleep(Duration::from_secs(15));
+    // Magic number
+    let mut countdown = 12;
+    while countdown > 0 {
+        println!("Remaining time: {} seconds", countdown);
+        thread::sleep(Duration::from_secs(1)); // 睡眠1秒
+        countdown -= 1;
+    }
 
     println!("[Helios-Android-JNI][Siyuan han Magic]: WWWWWWWWWake up!!!");
 

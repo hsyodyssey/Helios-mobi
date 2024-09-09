@@ -2,8 +2,8 @@
 
 ## Command
 
-1. Build the library
+1. Build the library for Java/Kotlin
 `cargo build --release`
 
-2. Move the library to the java library folder.
+2. Move the library to the local Java library folder.
 - `sudo cp target/release/libhelios_test_lib.so /usr/lib/x86_64-linux-gnu/jni`
