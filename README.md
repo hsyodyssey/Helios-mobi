@@ -18,12 +18,19 @@ Helios is a powerful library that is still under development. There are many une
 
 ### The programs will be crashed when generating a new Client.
 
-**Why**
 1. Inappropriate default absolute address. This issue causes by the following code snippets:  
 - https://github.com/a16z/helios/blob/master/client/src/client.rs#L109-L117
 - https://github.com/a16z/helios/blob/master/config/src/networks.rs#L56
 
+    **Trick Solution**
+    
+    This problem will lead app crashing issue. Here is a trick solution to avoid app-carsh. Set the default `data_dir = None`
 
+    ```
+    #[cfg(not(target_arch = "wasm32"))]
+     data_dir: None,
+    ..std::default::Default::default()
+    ```
 2. Failed in constructing new Node(ConsensusClient). This failure happens in the following code snippet:
 - https://github.com/a16z/helios/blob/master/client/src/node.rs#L34-L35
 

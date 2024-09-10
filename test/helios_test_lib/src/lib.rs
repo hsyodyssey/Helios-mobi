@@ -26,7 +26,10 @@ pub extern "C" fn Java_HeliosRust_getBalance(env: JNIEnv, _class: JClass) -> jst
     let temp_dir = env::temp_dir().join("helios");
 
     if let Err(e) = create_directory_if_not_exists(&temp_dir) {
-        eprintln!("[Helios-Android-JNI]: Failed to create helios directory: {}", e);
+        eprintln!(
+            "[Helios-Android-JNI]: Failed to create helios directory: {}",
+            e
+        );
     } else {
         println!(
             "[Helios-Android-JNI]: Helios directory created or already exists at: {:?}",
@@ -36,7 +39,10 @@ pub extern "C" fn Java_HeliosRust_getBalance(env: JNIEnv, _class: JClass) -> jst
 
     // Use async mode to get the balance
     let result: Result<String, String> = rt.block_on(async {
-        println!("[Helios-Android-JNI]: Building client with data directory: {:?}", temp_dir);
+        println!(
+            "[Helios-Android-JNI]: Building client with data directory: {:?}",
+            temp_dir
+        );
         match create_client(temp_dir) {
             Ok(client) => {
                 println!("[Helios-Android-JNI]: Client created successfully.");
@@ -87,13 +93,13 @@ fn create_client(temp_dir: PathBuf) -> Result<Client<FileDB>, String> {
         .network(Network::MAINNET)
         .consensus_rpc("https://www.lightclientdata.org")
         .execution_rpc(untrusted_rpc_url)
-        .load_external_fallback()   // this is important
+        .load_external_fallback() // this is important
         .data_dir(temp_dir)
         .checkpoint(b256!(
             "51c25b7f30627132fc636cd6b634ef4accf0a6c114c1adf8c808c122efdab276"
         ))
         .build()
-        .map_err(|e| format!("[Helios-Android-JNI]: Client build error: {}", e))?; // 错误处理
+        .map_err(|e| format!("[Helios-Android-JNI]: Client build error: {}", e))?;
 
     Ok(client)
 }
@@ -112,12 +118,11 @@ async fn get_balance(mut client: Client<FileDB>) -> Result<String, String> {
     let mut countdown = 12;
     while countdown > 0 {
         println!("Remaining time: {} seconds", countdown);
-        thread::sleep(Duration::from_secs(1)); // 睡眠1秒
+        thread::sleep(Duration::from_secs(1));
         countdown -= 1;
     }
 
     println!("[Helios-Android-JNI][Siyuan han Magic]: WWWWWWWWWake up!!!");
-
 
     let addr = Address::from_str("0x00000000219ab540356cBB839Cbe05303d7705Fa")
         .map_err(|e| format!("[Helios-Android-JNI]: Address parse error: {}", e))?;
@@ -128,7 +133,6 @@ async fn get_balance(mut client: Client<FileDB>) -> Result<String, String> {
         .get_balance(addr, block)
         .await
         .map_err(|e| format!("[Helios-Android-JNI]: Get balance error: {}", e))?;
-
 
     Ok(utils::format_ether(balance))
 }
