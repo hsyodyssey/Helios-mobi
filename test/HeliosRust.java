@@ -2,7 +2,7 @@ class HeliosRust {
     // This declares that the static `hello` method will be provided
     // a native library.
     private static native String getBalance();
-    private static native String getBlockNumber();
+    private static native String getLatestSyncedBlock();
 
 
 
@@ -18,7 +18,7 @@ class HeliosRust {
         String output = HeliosRust.getBalance();
         System.out.println("[Java|Kotlin] The balance is :" + output);
 
-        String lastestBlockNumber = HeliosRust.getBlockNumber();
-        System.out.println("[Java|Kotlin] The Latest Block Number is :" + lastestBlockNumber);
+        String getBlockByNumber = HeliosRust.getLatestSyncedBlock();
+        System.out.println("[Java|Kotlin] The latest block number is :" + getBlockByNumber);
     }
 }
