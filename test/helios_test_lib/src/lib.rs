@@ -39,7 +39,7 @@ fn init_data_env() -> PathBuf {
 }
 
 #[no_mangle]
-pub extern "C" fn Java_HeliosRust_getLastestBlockNumber(env: JNIEnv, _class: JClass) -> jstring {
+pub extern "C" fn Java_HeliosRust_getLatestBlockNumber(env: JNIEnv, _class: JClass) -> jstring {
     let rt = Runtime::new().unwrap();
     // which is a not best solution
     let temp_dir = init_data_env();
@@ -54,20 +54,20 @@ pub extern "C" fn Java_HeliosRust_getLastestBlockNumber(env: JNIEnv, _class: JCl
             Ok(client) => {
                 println!("[Helios-Android-JNI]: Client created successfully.");
 
-                let res = match get_block_number(client).await {
+                let res = match get_latest_block_number(client).await {
                     Ok(data) => {
                         println!(
-                            "[Helios-Android-JNI]: Get Lastest Block Numberance successfully."
+                            "[Helios-Android-JNI]: Get Latest Block Numberance successfully."
                         );
                         data
                     }
                     Err(err_msg) => {
                         println!(
-                            "[Helios-Android-JNI]: get Lastest Block Number falied, {}",
+                            "[Helios-Android-JNI]: get Latest Block Number falied, {}",
                             err_msg
                         );
                         String::from(
-                            "[Helios-Android-JNI]: Failed to get Lastest Block Number with error",
+                            "[Helios-Android-JNI]: Failed to get Latest Block Number with error",
                         )
                     }
                 };
@@ -163,70 +163,6 @@ pub extern "C" fn Java_HeliosRust_getBlockByNumber(
 
 
 #[no_mangle]
-pub extern "C" fn Java_HeliosRust_getLatestSyncedBlock(
-    env: JNIEnv,
-    _class: JClass,
-    input: jlong,
-) -> jstring {
-
-    let block_num: u64 = input as u64;
-
-    let rt = Runtime::new().unwrap();
-    // which is a not best solution
-    let temp_dir = init_data_env();
-
-    // Use async mode to get the balance
-    let result: Result<String, String> = rt.block_on(async {
-        println!(
-            "[Helios-Android-JNI]: Building client with data directory: {:?}",
-            temp_dir
-        );
-        match create_client(temp_dir) {
-            Ok(client) => {
-                println!("[Helios-Android-JNI]: Client created successfully.");
-
-                let res = match get_latest_synced_block(client).await {
-                    Ok(data) => {
-                        println!(
-                            "[Helios-Android-JNI]: Get Lastest Block Numberance successfully."
-                        );
-                        data
-                    }
-                    Err(err_msg) => {
-                        println!(
-                            "[Helios-Android-JNI]: get Lastest Block Number falied, {}",
-                            err_msg
-                        );
-                        String::from(
-                            "[Helios-Android-JNI]: Failed to get Lastest Block Number with error",
-                        )
-                    }
-                };
-                Ok(res.to_string())
-            }
-
-            Err(err_msg) => {
-                eprintln!("[Helios-Android-JNI]: Client creation error: {}", err_msg);
-                Ok(
-                    "[Helios-Android-JNI]: HSY Client created Failed due to dir creation error."
-                        .to_string(),
-                )
-            }
-        }
-    });
-    match result {
-        Ok(balance) => env
-            .new_string(balance)
-            .expect("[Helios-Android-JNI]: Couldn't create Java string!")
-            .into_raw(),
-        Err(err_msg) => env
-            .new_string(err_msg)
-            .expect("[Helios-Android-JNI]: Couldn't create Java string!")
-            .into_raw(),
-    }
-}
-
-#[no_mangle]
 pub extern "C" fn Java_HeliosRust_getBalance(env: JNIEnv, _class: JClass) -> jstring {
     let rt = Runtime::new().unwrap();
     // which is a not best solution
@@ -293,7 +229,7 @@ fn create_client(temp_dir: PathBuf) -> Result<Client<FileDB>, String> {
         .load_external_fallback() // this is important
         .data_dir(temp_dir)
         .checkpoint(b256!(
-            "b1fa30071b005ff86bae9f4b8698807231c352757a85950ba76a73badfbf5254"
+            "4cb357692b815ac5e8b282b83c2b4e53eae9b06c0a854981029f6f1c5fe5a128"
         ))
         .build()
         .map_err(|e| format!("[Helios-Android-JNI]: Client build error: {}", e))?;
@@ -334,38 +270,7 @@ async fn get_balance(mut client: Client<FileDB>) -> Result<String, String> {
     Ok(utils::format_ether(balance))
 }
 
-// TODO: return U256
-async fn get_block_number(mut client: Client<FileDB>) -> Result<String, String> {
-    println!("[Helios-Android-JNI]: Get latest block start");
-
-    client
-        .start()
-        .await
-        .map_err(|e| format!("[Helios-Android-JNI]: Client start error: {}", e))?;
-
-    println!("[Helios-Android-JNI][Siyuan han Magic]: Sleep for a while zzzzzzzzzzzzz");
-
-    // Magic number
-    let mut countdown = 12;
-    while countdown > 0 {
-        println!("Remaining time: {} seconds", countdown);
-        thread::sleep(Duration::from_secs(1));
-        countdown -= 1;
-    }
-
-    println!("[Helios-Android-JNI][Siyuan han Magic]: WWWWWWWWWake up!!!");
-
-    let block_num = client
-        .get_block_number()
-        .await
-        .map_err(|e| format!("[Helios-Android-JNI]: Get block_num error: {}", e))?;
-
-    Ok(block_num.to_string())
-}
-
-
-
-async fn get_latest_synced_block(mut client: Client<FileDB>) -> Result<String, String> {
+async fn get_latest_block_number(mut client: Client<FileDB>) -> Result<String, String> {
     println!("[Helios-Android-JNI]: Get Block by Number start");
     client
         .start()
