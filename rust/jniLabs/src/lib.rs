@@ -19,6 +19,112 @@ use std::{env, fs, io, path::Path, path::PathBuf, str::FromStr, thread, time::Du
 use tokio::runtime::Runtime;
 
 #[no_mangle]
+pub extern "C" fn Java_com_example_foldtest_RustLib_getLatestBlockNumber(env: JNIEnv, _class: JClass) -> jstring {
+    let rt = Runtime::new().unwrap();
+    // which is a not best solution
+    let temp_dir = env::temp_dir().join("helios");
+
+    if let Err(e) = create_directory_if_not_exists(&temp_dir) {
+        eprintln!(
+            "[Helios-Android-JNI]: Failed to create helios directory: {}",
+            e
+        );
+    } else {
+        println!(
+            "[Helios-Android-JNI]: Helios directory created or already exists at: {:?}",
+            temp_dir
+        );
+    }
+
+    let result: Result<String, String> = rt.block_on(async {
+        println!(
+            "[Helios-Android-JNI]: Building client with data directory: {:?}",
+            temp_dir
+        );
+        match create_client(temp_dir) {
+            Ok(client) => {
+                println!("[Helios-Android-JNI]: Client created successfully.");
+
+                let res = match get_latest_block_number(client).await {
+                    Ok(data) => {
+                        println!(
+                            "[Helios-Android-JNI]: Get Latest Block Numberance successfully."
+                        );
+                        data
+                    }
+                    Err(err_msg) => {
+                        println!(
+                            "[Helios-Android-JNI]: get Latest Block Number falied, {}",
+                            err_msg
+                        );
+                        String::from(
+                            "[Helios-Android-JNI]: Failed to get Latest Block Number with error",
+                        )
+                    }
+                };
+
+                Ok(res.to_string())
+            }
+
+            Err(err_msg) => {
+                eprintln!("[Helios-Android-JNI]: Client creation error: {}", err_msg);
+                Ok(
+                    "[Helios-Android-JNI]: HSY Client created Failed due to dir creation error."
+                        .to_string(),
+                )
+            }
+        }
+    });
+    match result {
+        Ok(balance) => env
+            .new_string(balance)
+            .expect("[Helios-Android-JNI]: Couldn't create Java string!")
+            .into_raw(),
+        Err(err_msg) => env
+            .new_string(err_msg)
+            .expect("[Helios-Android-JNI]: Couldn't create Java string!")
+            .into_raw(),
+    }
+}
+
+
+#[no_mangle]
+pub extern "C" fn Java_com_example_foldtest_RustLib_getLatestCheckpoint(env: JNIEnv, _class: JClass) -> jstring {
+    let rt = Runtime::new().unwrap();
+    // Use async mode to get the balance
+    let result: Result<String, String> = rt.block_on(async {
+        let res = match get_latest_checkpoint().await {
+            Ok(data) => {
+                println!(
+                    "[Helios-Android-JNI]: Get Lastest Block Numberance successfully."
+                );
+                data
+            }
+            Err(err_msg) => {
+                println!(
+                    "[Helios-Android-JNI]: get Lastest Block Number falied, {}",
+                    err_msg
+                );
+                String::from(
+                    "[Helios-Android-JNI]: Failed to get Lastest Block Number with error",
+                )
+            }
+        };
+        Ok(res.to_string())
+    });
+    match result {
+        Ok(balance) => env
+            .new_string(balance)
+            .expect("[Helios-Android-JNI]: Couldn't create Java string!")
+            .into_raw(),
+        Err(err_msg) => env
+            .new_string(err_msg)
+            .expect("[Helios-Android-JNI]: Couldn't create Java string!")
+            .into_raw(),
+    }
+}
+
+#[no_mangle]
 pub extern "C" fn Java_com_example_foldtest_RustLib_getBalance(
     env: JNIEnv,
     _class: JClass,
@@ -97,7 +203,7 @@ fn create_client(temp_dir: PathBuf) -> Result<Client<FileDB>, String> {
         .load_external_fallback()
         .data_dir(temp_dir)
         .checkpoint(b256!(
-            "51c25b7f30627132fc636cd6b634ef4accf0a6c114c1adf8c808c122efdab276"
+            "4cb357692b815ac5e8b282b83c2b4e53eae9b06c0a854981029f6f1c5fe5a128"
         ))
         .build()
         .map_err(|e| format!("Client build error: {}", e))?;
@@ -116,10 +222,10 @@ async fn get_balance(mut client: Client<FileDB>) -> Result<String, String> {
     println!("[Helios-Android-JNI][Siyuan han Magic]: Sleep for a while zzzzzzzzzzzzz");
 
     // Magic number
-    let mut countdown = 15;
+    let mut countdown = 14;
     while countdown > 0 {
         println!("Remaining time: {} seconds", countdown);
-        thread::sleep(Duration::from_secs(1)); // 睡眠1秒
+        thread::sleep(Duration::from_secs(1)); 
         countdown -= 1;
     }
 
@@ -137,56 +243,44 @@ async fn get_balance(mut client: Client<FileDB>) -> Result<String, String> {
 
     Ok(utils::format_ether(balance))
 }
-// The following code was used for step testing
-// Will be deprecated after the stable library released.
-// #[no_mangle]
-// pub extern "C" fn Java_com_example_foldtest_RustLib_testClientStepByStepTest(
-//     env: JNIEnv,
-//     _class: JClass,
-// ) -> jstring {
-//     let mut builder = ClientBuilder::new();
 
-//     // Set the network to mainnet
-//     builder = builder.network(networks::Network::MAINNET);
+async fn get_latest_block_number(mut client: Client<FileDB>) -> Result<String, String> {
+    println!("[Helios-Android-JNI]: Get Block by Number start");
+    client
+        .start()
+        .await
+        .map_err(|e| format!("[Helios-Android-JNI]: Client start error: {}", e))?;
 
-//     // // Set the consensus rpc url
-//     builder = builder.consensus_rpc("https://www.lightclientdata.org");
+    println!("[Helios-Android-JNI][Siyuan han Magic]: Sleep for a while zzzzzzzzzzzzz");
 
-//     // // Set the execution rpc url
-//     builder = builder.execution_rpc("https://eth-mainnet.g.alchemy.com/v2/XXXXX");
+    // Magic number
 
-//     // // Set the checkpoint to the last known checkpoint
-//     builder = builder.checkpoint(b256!(
-//         "85e6151a246e8fdba36db27a0c7678a575346272fe978c9281e13a8b26cdfa68"
-//     ));
+    thread::sleep(Duration::from_secs(14));
 
-//     // Set the rpc port
-//     builder = builder.rpc_port(8545);
 
-//     // Set the data dir
-//     let temp_dir = env::temp_dir().join("helios");
+    let block: Option<Block> = client
+        .get_block_by_number(BlockTag::Latest, false)
+        .await
+        .map_err(|e| format!("[Helios-Android-JNI]: Get Block error: {}", e))?;
 
-//     if let Err(e) = create_directory_if_not_exists(&temp_dir) {
-//         eprintln!("Failed to create helios directory: {}", e);
-//     } else {
-//         println!(
-//             "Helios directory created or already exists at: {:?}",
-//             temp_dir
-//         );
-//     }
-//     builder = builder.data_dir(temp_dir);
+    match block {
+        Some(value) => Ok(value.number.to_string()),
+        None => Ok("no such block".to_string()),
+    }
+}
 
-//     // // Set the fallback service
-//     builder = builder.fallback("https://sync-mainnet.beaconcha.in");
 
-//     // // Enable lazy checkpoints
-//     builder = builder.load_external_fallback();
+async fn get_latest_checkpoint() -> Result<String, String> {
+    let cf = checkpoints::CheckpointFallback::new()
+        .build()
+        .await
+        .unwrap();
 
-//     // Build the client
-//     let mut client: Client<FileDB> = builder.build().unwrap();
-//     println!("Constructed client!");
+    let mainnet_checkpoint = cf
+        .fetch_latest_checkpoint(&networks::Network::MAINNET)
+        .await
+        .unwrap();
+    println!("Fetched latest mainnet checkpoint: {mainnet_checkpoint}");
 
-//     env.new_string(format!("This is from Rust"))
-//         .expect("Couldn't create Java string!")
-//         .into_raw()
-// }
+    Ok(mainnet_checkpoint.to_string())
+}
