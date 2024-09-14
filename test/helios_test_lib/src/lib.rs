@@ -15,6 +15,7 @@ use alloy::primitives::{utils, Address};
 use eyre::Result;
 
 use helios::{client::ClientBuilder, config::networks::Network, prelude::*, types::BlockTag};
+use std::f32::consts::E;
 use std::thread;
 use std::time::Duration;
 use std::{env, fs, io, path::Path, path::PathBuf, str::FromStr};
@@ -161,6 +162,42 @@ pub extern "C" fn Java_HeliosRust_getBlockByNumber(
     }
 }
 
+
+#[no_mangle]
+pub extern "C" fn Java_HeliosRust_getLatestCheckpoint(env: JNIEnv, _class: JClass) -> jstring {
+    let rt = Runtime::new().unwrap();
+    // Use async mode to get the balance
+    let result: Result<String, String> = rt.block_on(async {
+        let res = match get_latest_checkpoint().await {
+            Ok(data) => {
+                println!(
+                    "[Helios-Android-JNI]: Get Lastest Block Numberance successfully."
+                );
+                data
+            }
+            Err(err_msg) => {
+                println!(
+                    "[Helios-Android-JNI]: get Lastest Block Number falied, {}",
+                    err_msg
+                );
+                String::from(
+                    "[Helios-Android-JNI]: Failed to get Lastest Block Number with error",
+                )
+            }
+        };
+        Ok(res.to_string())
+    });
+    match result {
+        Ok(balance) => env
+            .new_string(balance)
+            .expect("[Helios-Android-JNI]: Couldn't create Java string!")
+            .into_raw(),
+        Err(err_msg) => env
+            .new_string(err_msg)
+            .expect("[Helios-Android-JNI]: Couldn't create Java string!")
+            .into_raw(),
+    }
+}
 
 #[no_mangle]
 pub extern "C" fn Java_HeliosRust_getBalance(env: JNIEnv, _class: JClass) -> jstring {
@@ -330,4 +367,19 @@ async fn get_block_by_number(mut client: Client<FileDB>, block_num: u64) -> Resu
         Some(value) => Ok(value.number.to_string()),
         None => Ok("no such block".to_string()),
     }
+}
+
+async fn get_latest_checkpoint() -> Result<String, String> {
+    let cf = checkpoints::CheckpointFallback::new()
+        .build()
+        .await
+        .unwrap();
+
+    let mainnet_checkpoint = cf
+        .fetch_latest_checkpoint(&networks::Network::MAINNET)
+        .await
+        .unwrap();
+    println!("Fetched latest mainnet checkpoint: {mainnet_checkpoint}");
+
+    Ok(mainnet_checkpoint.to_string())
 }
