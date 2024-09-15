@@ -12,10 +12,11 @@
 - [ ] Task 1: Fix: consensus client constructing failed problem: refactor Helios-Rust
     - [ ] Sub-Task 1: Feat: decouple the consensus client create and sync fucntion.
 - [ ] Task 2: Feat: JNI Interface for Android(Rust + Kotlin)
-- [] Task 3: Feat: Support getting block data via any block number. The current Helios library seems to only support the Latest block and Finalized block based on latest epoch.
-    - [] Sub-Task 1: Feat: We need modify and add more functions to Helios consensus-inner part.
-    - [] Sub-Task 2: Docs: We will write a detailed blog about the mechanism about how helios works.
-
+- [ ] Task 3: Feat: Support getting block data via any block number. The current Helios library seems to only support the Latest block and Finalized block based on latest epoch.
+    - [ ] Sub-Task 1: Feat: We need modify and add more functions to Helios consensus-inner part.
+    - [ ] Sub-Task 2: Docs: We will write a detailed blog about the mechanism about how helios works.
+- [ ] Task 4: Automation: Auto Sync the latest checkpoints
+- [ ] Task 5: High-availability: how to guarantee the high avaliable network connection via weak mobile net env
 ## Current Problem
 Helios is a powerful library that is still under development. There are many unexpected issues when using it as an external library for Android. Here are several issues we have faced:
 
