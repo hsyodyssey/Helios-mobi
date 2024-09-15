@@ -2,6 +2,10 @@
 
 ## Introduction
 
+<p align="center">
+<img src="./blgo2.png" width="148" style="border-radius: 55%;"/>
+</p>
+
 - This repository aims to run [Helios](https://github.com/a16z) light client on Android via JNI.
 - This repository is a preliminary project for a universal light client project: a cross-platform light client library for all EVM-based chains (including L1 and L2 chains, such as Ethereum Mainnet, BSC, Tron, Scroll, and MegaETH).
 - This repository is still under development and is not ready for any production-level projects.
