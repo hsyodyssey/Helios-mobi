@@ -12,6 +12,7 @@ alloy = { version = "0.2.1", features = ["full"] }
 eyre = "0.6.12"
 criterion = { version = "0.5.1", features = ["async_tokio", "plotters"] }
 ureq = "2.5"
+hex = "0.4"
 
 [lib]
 crate_type = ["cdylib"]

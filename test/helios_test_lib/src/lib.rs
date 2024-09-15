@@ -97,6 +97,7 @@ pub extern "C" fn Java_HeliosRust_getLatestBlockNumber(env: JNIEnv, _class: JCla
     }
 }
 
+
 #[no_mangle]
 pub extern "C" fn Java_HeliosRust_getBlockByNumber(
     env: JNIEnv,
