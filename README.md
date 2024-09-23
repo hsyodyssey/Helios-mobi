@@ -44,3 +44,5 @@ Helios is a powerful library that is still under development. There are many une
 
 3. Client synced failed. `client.wait_synced().await;`
 The client syncing process is killed by JVM for unknown reasons.
+
+4. Unstable Mobile network issue.
